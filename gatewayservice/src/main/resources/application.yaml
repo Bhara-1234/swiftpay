@@ -1,0 +1,48 @@
+spring:
+
+  application:
+    name: swiftpay-gateway
+
+  data:
+    redis:
+      host: 3.91.192.213
+      port: 6379
+
+  kafka:
+    bootstrap-servers: 3.91.192.213:9092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      properties:
+        spring.json.add.type.headers: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/swiftpay
+    username: postgres
+    password: Bhara@1234
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.swiftpay.gatewayservice: DEBUG

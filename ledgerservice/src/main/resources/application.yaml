@@ -1,0 +1,68 @@
+spring:
+
+  application:
+    name: swiftpay-ledger
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/swiftpay
+    username: postgres
+    password: Bhara@1234
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+  kafka:
+
+    bootstrap-servers: 3.91.192.213:9092
+
+    consumer:
+
+      group-id: ledger-group
+
+      auto-offset-reset: earliest
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: com.swiftpay.ledgerservice.event.PaymentEvent
+        spring.json.use.type.headers: false
+
+    producer:
+
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      properties:
+        spring.json.add.type.headers: false
+
+management:
+
+  endpoints:
+
+    web:
+
+      exposure:
+
+        include: health,info
+
+server:
+  port: 8081
+
+logging:
+
+  level:
+
+    root: INFO
+
+    com.swiftpay.ledgerservice: DEBUG
