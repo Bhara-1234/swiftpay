@@ -1,0 +1,47 @@
+name: SwiftPay CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build Gateway Service
+        run: |
+          cd gatewayservice
+          mvn clean package
+
+      - name: Build Ledger Service
+        run: |
+          cd ledgerservice
+          mvn clean package
+
+      - name: Build Gateway Docker Image
+        run: |
+          docker build -t gatewayservice ./gatewayservice
+
+      - name: Build Ledger Docker Image
+        run: |
+          docker build -t ledgerservice ./ledgerservice
