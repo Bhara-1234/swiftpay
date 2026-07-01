@@ -12,6 +12,7 @@ The system consists of two microservices:
    - Ensures idempotency using Redis.
    - Stores transactions with PENDING status.
    - Publishes payment events to Kafka.
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/9da2c3d7-d2eb-45ea-85ca-b1108bc428f0" />
 
 2. **Ledger Service**
    - Consumes payment events from Kafka.
@@ -251,6 +252,7 @@ Sample Response:
 - Sender account must exist.
 - Receiver account must exist.
 - Sender must have sufficient balance.
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/06d8ba71-1282-4dce-b684-3601597ed425" />
 
 ---
 
@@ -261,6 +263,7 @@ Redis is used to prevent duplicate transaction processing.
 Duplicate requests with the same transaction ID are rejected.
 
 ---
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7d142ae8-b1a6-4c66-a520-dfd83355fe36" />
 
 # Running the Application
 
