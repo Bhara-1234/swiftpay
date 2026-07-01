@@ -20,4 +20,6 @@ public class TransactionHistoryResponse {
 	private String currency;
 
 	private String status;
+	
+	private String remarks;
 }

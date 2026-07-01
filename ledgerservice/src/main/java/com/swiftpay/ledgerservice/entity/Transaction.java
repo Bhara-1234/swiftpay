@@ -31,6 +31,9 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
+    @Column(name = "remarks")
+    private String remarks;
+    
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

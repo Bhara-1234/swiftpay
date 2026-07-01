@@ -58,6 +58,8 @@ public class LedgerService {
 
 			transaction.setStatus(TransactionStatus.FAILED);
 
+			transaction.setRemarks("Insufficient Balance");
+
 			transactionRepository.save(transaction);
 
 			kafkaTemplate.send("payment-failed",
@@ -84,6 +86,8 @@ public class LedgerService {
 
 		transactionRepository.save(transaction);
 
+		transaction.setRemarks("Payment Completed Successfully");
+
 		log.info("Transaction {} status updated to SUCCESS", event.getTransactionId());
 
 		kafkaTemplate.send("payment-completed",
@@ -99,8 +103,10 @@ public class LedgerService {
 		log.info("Fetching transaction history for user : {}", userId);
 
 		List<TransactionHistoryResponse> transactions = transactionRepository.findBySenderIdOrReceiverId(userId, userId)
-				.stream().map(txn -> new TransactionHistoryResponse(txn.getTransactionId(), txn.getSenderId(),
-						txn.getReceiverId(), txn.getAmount(), txn.getCurrency(), txn.getStatus().name()))
+				.stream()
+				.map(txn -> new TransactionHistoryResponse(txn.getTransactionId(), txn.getSenderId(),
+						txn.getReceiverId(), txn.getAmount(), txn.getCurrency(), txn.getStatus().name(),
+						txn.getRemarks()))
 				.toList();
 
 		log.info("Fetched {} transactions for user : {}", transactions.size(), userId);
