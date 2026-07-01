@@ -1,1 +1,414 @@
-# swiftpay
+# SwiftPay - Payment Ledger
+
+## Overview
+
+SwiftPay is an event-driven peer-to-peer payment processing system built using Spring Boot, Apache Kafka, Redis, and PostgreSQL.
+
+The system consists of two microservices:
+
+1. **Transaction Gateway Service**
+   - Accepts payment requests.
+   - Performs request validations.
+   - Ensures idempotency using Redis.
+   - Stores transactions with PENDING status.
+   - Publishes payment events to Kafka.
+
+2. **Ledger Service**
+   - Consumes payment events from Kafka.
+   - Validates business rules.
+   - Processes debit and credit operations.
+   - Updates transaction status.
+   - Publishes payment completion/failure events.
+
+---
+
+# Architecture
+
+```text
++-------------------+
+|      Client       |
++-------------------+
+          |
+          v
++----------------------------+
+| Transaction Gateway Service |
++----------------------------+
+          |
+          | Save PENDING Transaction
+          |
+          +------------+
+          |            |
+          v            v
+      Redis         Kafka
+  (Idempotency)      |
+                     |
+                     v
+      +----------------------+
+      |   Ledger Service     |
+      +----------------------+
+                     |
+                     v
+              PostgreSQL
+```
+
+---
+
+# Features
+
+- Event-driven architecture using Kafka
+- Payment initiation API
+- Transaction status API
+- Transaction history API
+- Redis-based idempotency
+- Sender/Receiver validation
+- Balance validation
+- Global exception handling
+- Kafka retry mechanism
+- Swagger/OpenAPI documentation
+- Health check endpoints
+- Dockerized deployment
+- CI/CD using GitHub Actions
+
+---
+
+# Technology Stack
+
+| Technology | Version |
+|------------|---------|
+| Java | 21 |
+| Spring Boot | 3.x |
+| Spring Data JPA | Latest |
+| PostgreSQL | 16 |
+| Apache Kafka | 7.5 |
+| Redis | 7 |
+| Docker | Latest |
+| Docker Compose | Latest |
+| Swagger/OpenAPI | Latest |
+| GitHub Actions | Latest |
+
+---
+
+# Project Structure
+
+```text
+swiftpay/
+│
+├── swiftpay-gateway/
+│   ├── src/
+│   ├── Dockerfile
+│   └── pom.xml
+│
+├── swiftpay-ledger/
+│   ├── src/
+│   ├── Dockerfile
+│   └── pom.xml
+│
+├── docker-compose.yml
+├── README.md
+└── .github/workflows/build.yml
+```
+
+---
+
+# Kafka Topics
+
+| Topic Name | Description |
+|------------|-------------|
+| payment-initiated | Published by Gateway Service |
+| payment-completed | Published by Ledger Service |
+| payment-failed | Published by Ledger Service |
+
+---
+
+# APIs
+
+## Transaction Gateway Service
+
+### Create Payment
+
+**POST**
+
+```http
+/v1/payments
+```
+
+Sample Request:
+
+```json
+{
+  "transactionId": "TXN1001",
+  "senderId": 1,
+  "receiverId": 2,
+  "amount": 500,
+  "currency": "INR"
+}
+```
+
+Sample Response:
+
+```json
+{
+  "transactionId": "TXN1001",
+  "status": "PENDING",
+  "message": "Payment accepted for processing"
+}
+```
+
+---
+
+### Get Transaction Status
+
+**GET**
+
+```http
+/v1/payments/{transactionId}
+```
+
+Example:
+
+```http
+/v1/payments/TXN1001
+```
+
+Sample Response:
+
+```json
+{
+  "transactionId": "TXN1001",
+  "status": "SUCCESS",
+  "message": "Transaction status fetched successfully"
+}
+```
+
+---
+
+## Ledger Service
+
+### Create User
+
+**POST**
+
+```http
+/v1/ledger/users
+```
+
+Sample Request:
+
+```json
+{
+  "id": 1,
+  "name": "Bharadwaj",
+  "balance": 10000
+}
+```
+
+---
+
+### Get Transaction History
+
+**GET**
+
+```http
+/v1/ledger/transactions/{userId}
+```
+
+Example:
+
+```http
+/v1/ledger/transactions/1
+```
+
+Sample Response:
+
+```json
+[
+  {
+    "transactionId": "TXN1001",
+    "senderId": 1,
+    "receiverId": 2,
+    "amount": 500,
+    "currency": "INR",
+    "status": "SUCCESS"
+  }
+]
+```
+
+---
+
+# Validation Rules
+
+### Gateway Service
+
+- Duplicate transactions are rejected.
+- Sender and Receiver cannot be the same.
+- Unsupported currencies are rejected.
+- Sender account must exist.
+- Receiver account must exist.
+
+### Ledger Service
+
+- Transaction must exist.
+- Sender account must exist.
+- Receiver account must exist.
+- Sender must have sufficient balance.
+
+---
+
+# Idempotency
+
+Redis is used to prevent duplicate transaction processing.
+
+Duplicate requests with the same transaction ID are rejected.
+
+---
+
+# Running the Application
+
+## Prerequisites
+
+- Docker
+- Docker Compose
+
+---
+
+## Clone Repository
+
+```bash
+git clone <repository-url>
+cd swiftpay
+```
+
+---
+
+## Start Entire Ecosystem
+
+```bash
+docker compose up -d
+```
+
+---
+
+## Verify Running Containers
+
+```bash
+docker ps
+```
+
+Expected containers:
+
+```text
+postgres
+redis
+zookeeper
+kafka
+gateway
+ledger
+```
+
+---
+
+## Stop Application
+
+```bash
+docker compose down
+```
+
+---
+
+# Swagger Documentation
+
+## Gateway Service
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+## Ledger Service
+
+```text
+http://localhost:8081/swagger-ui/index.html
+```
+
+---
+
+# Health Endpoints
+
+## Gateway
+
+```text
+http://localhost:8080/actuator/health
+```
+
+## Ledger
+
+```text
+http://localhost:8081/actuator/health
+```
+
+---
+
+# Logging
+
+Application logs are enabled using SLF4J and Logback.
+
+Important events logged:
+
+- Payment processing started
+- Payment completed
+- Payment failed
+- Validation failures
+- Kafka event consumption
+
+---
+
+# Error Handling
+
+Global exception handlers are implemented in both services.
+
+Common errors:
+
+- Duplicate Transaction
+- Invalid Payment Request
+- Resource Not Found
+- Insufficient Funds
+- Validation Failure
+
+---
+
+# Retry Mechanism
+
+Kafka consumers are configured with retry support to handle temporary failures such as database unavailability.
+
+---
+
+# CI/CD
+
+GitHub Actions workflow automatically:
+
+- Builds Gateway Service
+- Builds Ledger Service
+- Runs Maven tests
+- Builds Docker images
+
+Workflow file:
+
+```text
+.github/workflows/build.yml
+```
+
+---
+
+# Future Enhancements
+
+- Notification Service
+- Fraud Detection Service
+- Multi-broker Kafka Cluster
+- Prometheus & Grafana Monitoring
+- Distributed Tracing
+- Kubernetes Deployment
+
+---
+
+# Author
+
+**Bodda Bharadwaj**
