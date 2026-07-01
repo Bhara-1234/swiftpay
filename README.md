@@ -416,7 +416,45 @@ Workflow file:
 - Kubernetes Deployment
 
 ---
+## Performance Testing
 
+Performance testing was performed using Apache JMeter.
+
+### Test Configuration
+
+- Concurrent Users: 250
+- Ramp-Up Period: 1 second
+- Loop Count: 100
+- Total Requests Executed: 25,000
+
+### Results
+
+| Metric | Value |
+|---------|-------|
+| Total Requests | 25,000 |
+| Average Response Time | 522 ms |
+| Throughput | 388.98 requests/sec |
+| Received Throughput | 256.13 KB/sec |
+| Sent Throughput | 103.77 KB/sec |
+
+### Observations
+
+- The system successfully processed approximately **389 transactions per second (TPS)**.
+- The achieved throughput exceeded the required **250 TPS** target.
+- No major failures were observed during the test execution.
+
+### Identified Bottleneck
+
+During load testing, database write operations were identified as the primary bottleneck because every payment request performs synchronous persistence before asynchronous processing through Kafka.
+
+### Possible Optimizations
+
+- Increase database connection pool size (HikariCP tuning).
+- Add indexes on frequently queried columns such as `transaction_id`.
+- Scale Gateway and Ledger services horizontally.
+- Introduce Kafka producer batching.
+- Deploy PostgreSQL on a dedicated instance for improved performance.
+  
 # Author
 
 **Bodda Bharadwaj**
