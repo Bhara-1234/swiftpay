@@ -437,6 +437,8 @@ Performance testing was performed using Apache JMeter.
 | Received Throughput | 256.13 KB/sec |
 | Sent Throughput | 103.77 KB/sec |
 
+The `evidences/jmeter-metrics/Payment API.jmx` file contains the Apache JMeter test plan used for performance testing and can be imported directly into JMeter to reproduce the load test.
+
 ### Observations
 
 - The system successfully processed approximately **389 transactions per second (TPS)**.
