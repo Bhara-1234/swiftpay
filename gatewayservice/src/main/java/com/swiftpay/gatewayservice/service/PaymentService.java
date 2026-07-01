@@ -80,8 +80,7 @@ public class PaymentService {
 
 		log.info("Transaction {} status is {}", transactionId, txn.getStatus());
 
-		return new PaymentResponse(txn.getTransactionId(), txn.getStatus().name(),
-				"Transaction status fetched successfully");
+		return new PaymentResponse(txn.getTransactionId(), txn.getStatus().name(), txn.getRemarks());
 	}
 
 	public UserAccount createUser(UserAccount user) {

@@ -8,6 +8,7 @@ import com.swiftpay.gatewayservice.dto.PaymentRequest;
 import com.swiftpay.gatewayservice.exception.DuplicateTransactionException;
 import com.swiftpay.gatewayservice.exception.InvalidPaymentException;
 import com.swiftpay.gatewayservice.exception.ResourceNotFoundException;
+import com.swiftpay.gatewayservice.repository.TransactionRepository;
 import com.swiftpay.gatewayservice.repository.UserAccountRepository;
 import com.swiftpay.gatewayservice.service.RedisService;
 
@@ -20,6 +21,8 @@ public class PaymentValidationUtil {
 	private final RedisService redisService;
 
 	private final UserAccountRepository userRepository;
+
+	private final TransactionRepository transactionRepository;
 
 	public void validatePaymentRequest(PaymentRequest request) {
 
@@ -34,7 +37,7 @@ public class PaymentValidationUtil {
 
 	private void validateDuplicateTransaction(PaymentRequest request) {
 
-		if (redisService.isDuplicate(request.getTransactionId())) {
+		if (redisService.isDuplicate(request.getTransactionId()) || transactionRepository.findByTransactionId(request.getTransactionId()).isPresent()) {
 
 			throw new DuplicateTransactionException("Duplicate Transaction");
 		}

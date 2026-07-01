@@ -39,6 +39,8 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
+    private String remarks;
+    
     private LocalDateTime createdAt;
 
     @PrePersist
