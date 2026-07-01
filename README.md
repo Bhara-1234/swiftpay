@@ -322,24 +322,29 @@ docker compose down
 ```text
 http://localhost:8080/swagger-ui/index.html
 ```
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/761cc3d7-1dd2-42b5-9638-06c32869da38" />
+
 
 ## Ledger Service
 
 ```text
 http://localhost:8081/swagger-ui/index.html
 ```
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e063d44b-336f-411c-8a00-db6b8ca56633" />
 
 ---
 
 # Health Endpoints
 
 ## Gateway
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/fd1501bd-aa8d-4c4e-89d3-66147e3d8afb" />
 
 ```text
 http://localhost:8080/actuator/health
 ```
 
 ## Ledger
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/32423565-4238-4a70-a833-247be2b9f062" />
 
 ```text
 http://localhost:8081/actuator/health
