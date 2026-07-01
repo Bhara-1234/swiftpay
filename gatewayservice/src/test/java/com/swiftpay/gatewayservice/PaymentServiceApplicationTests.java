@@ -79,6 +79,7 @@ class PaymentServiceApplicationTests {
 		Transaction txn = new Transaction();
 		txn.setTransactionId("TXN001");
 		txn.setStatus(TransactionStatus.SUCCESS);
+		txn.setRemarks("Payment Completed Successfully");
 
 		when(repository.findByTransactionId("TXN001")).thenReturn(Optional.of(txn));
 
@@ -87,7 +88,7 @@ class PaymentServiceApplicationTests {
 		assertNotNull(response);
 		assertEquals("TXN001", response.getTransactionId());
 		assertEquals("SUCCESS", response.getStatus());
-		assertEquals("Transaction status fetched successfully", response.getMessage());
+		assertEquals("Payment Completed Successfully", response.getMessage());
 
 		verify(repository, times(1)).findByTransactionId("TXN001");
 	}
