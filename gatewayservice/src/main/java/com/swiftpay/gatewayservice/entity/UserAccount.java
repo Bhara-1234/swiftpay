@@ -1,4 +1,4 @@
-package com.swiftpay.ledgerservice.entity;
+package com.swiftpay.gatewayservice.entity;
 
 import java.math.BigDecimal;
 

@@ -13,9 +13,9 @@ import com.swiftpay.ledgerservice.entity.UserAccount;
 import com.swiftpay.ledgerservice.enums.TransactionStatus;
 import com.swiftpay.ledgerservice.event.PaymentEvent;
 import com.swiftpay.ledgerservice.event.PaymentStatusEvent;
-import com.swiftpay.ledgerservice.exception.ResourceNotFoundException;
 import com.swiftpay.ledgerservice.repository.TransactionRepository;
 import com.swiftpay.ledgerservice.repository.UserAccountRepository;
+import com.swiftpay.ledgerservice.util.LedgerValidationUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,25 +29,32 @@ public class LedgerService {
 
 	private final TransactionRepository transactionRepository;
 
+	private final LedgerValidationUtil validationUtil;
+
 	private final KafkaTemplate<String, PaymentStatusEvent> kafkaTemplate;
 
 	@Transactional
 	public void processPayment(PaymentEvent event) {
 
-		log.info("Processing Payment : {}", event.getTransactionId());
+		log.info("Processing payment for transaction : {}", event.getTransactionId());
 
-		Transaction transaction = transactionRepository.findByTransactionId(event.getTransactionId())
-				.orElseThrow(() -> new ResourceNotFoundException("Transaction Not Found"));
+		log.debug("Received payment event : {}", event);
 
-		UserAccount sender = userRepository.findById(event.getSenderId())
-				.orElseThrow(() -> new ResourceNotFoundException("Sender Account Not Found"));
+		Transaction transaction = validationUtil.validateTransaction(event);
 
-		UserAccount receiver = userRepository.findById(event.getReceiverId())
-				.orElseThrow(() -> new ResourceNotFoundException("Receiver Account Not Found"));
+		UserAccount sender = validationUtil.validateSender(event);
+
+		UserAccount receiver = validationUtil.validateReceiver(event);
+
+		log.debug("Sender details : {}", sender);
+
+		log.debug("Receiver details : {}", receiver);
 
 		BigDecimal amount = event.getAmount();
 
-		if (sender.getBalance().compareTo(amount) < 0) {
+		log.debug("Amount to transfer : {}", amount);
+
+		if (!validationUtil.validateBalance(sender, amount)) {
 
 			transaction.setStatus(TransactionStatus.FAILED);
 
@@ -56,7 +63,7 @@ public class LedgerService {
 			kafkaTemplate.send("payment-failed",
 					new PaymentStatusEvent(event.getTransactionId(), "FAILED", "Insufficient Balance"));
 
-			log.error("Payment Failed : Insufficient balance for txn {}", event.getTransactionId());
+			log.error("Payment failed due to insufficient balance for transaction : {}", event.getTransactionId());
 
 			return;
 		}
@@ -65,35 +72,39 @@ public class LedgerService {
 
 		receiver.setBalance(receiver.getBalance().add(amount));
 
+		log.debug("Updated sender balance : {}", sender.getBalance());
+
+		log.debug("Updated receiver balance : {}", receiver.getBalance());
+
 		userRepository.save(sender);
+
 		userRepository.save(receiver);
 
 		transaction.setStatus(TransactionStatus.SUCCESS);
 
 		transactionRepository.save(transaction);
 
+		log.info("Transaction {} status updated to SUCCESS", event.getTransactionId());
+
 		kafkaTemplate.send("payment-completed",
 				new PaymentStatusEvent(event.getTransactionId(), "SUCCESS", "Payment Completed Successfully"));
+
+		log.info("Published payment-completed event for transaction : {}", event.getTransactionId());
 
 		log.info("Payment {} completed successfully", event.getTransactionId());
 	}
 
 	public List<TransactionHistoryResponse> getTransactions(Long userId) {
 
-		return transactionRepository.findBySenderIdOrReceiverId(userId, userId).stream()
-				.map(txn -> new TransactionHistoryResponse(txn.getTransactionId(), txn.getSenderId(),
+		log.info("Fetching transaction history for user : {}", userId);
+
+		List<TransactionHistoryResponse> transactions = transactionRepository.findBySenderIdOrReceiverId(userId, userId)
+				.stream().map(txn -> new TransactionHistoryResponse(txn.getTransactionId(), txn.getSenderId(),
 						txn.getReceiverId(), txn.getAmount(), txn.getCurrency(), txn.getStatus().name()))
 				.toList();
-	}
 
-	public UserAccount createUser(UserAccount user) {
+		log.info("Fetched {} transactions for user : {}", transactions.size(), userId);
 
-		boolean exists = userRepository.existsById(user.getId());
-
-		if (exists) {
-			throw new RuntimeException("User already exists");
-		}
-
-		return userRepository.save(user);
+		return transactions;
 	}
 }

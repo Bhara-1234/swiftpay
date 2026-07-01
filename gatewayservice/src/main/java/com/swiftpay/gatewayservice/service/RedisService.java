@@ -11,17 +11,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RedisService {
 
-    private final StringRedisTemplate redisTemplate;
+	private final StringRedisTemplate redisTemplate;
 
-    public boolean isDuplicate(String transactionId) {
+	public boolean isDuplicate(String transactionId) {
 
-        Boolean inserted =
-                redisTemplate.opsForValue()
-                        .setIfAbsent(
-                                "payment:" + transactionId,
-                                "PROCESSED",
-                                Duration.ofHours(24));
+		Boolean inserted = redisTemplate.opsForValue().setIfAbsent("payment:" + transactionId, "PROCESSED",
+				Duration.ofHours(24));
 
-        return Boolean.FALSE.equals(inserted);
-    }
+		return Boolean.FALSE.equals(inserted);
+	}
 }
