@@ -54,10 +54,8 @@ public class LedgerService {
 
 		log.debug("Amount to transfer : {}", amount);
 
-		// Atomic debit operation
-		int rowsUpdated = userRepository.debitBalance(sender.getId(), amount);
 
-		if (rowsUpdated == 0) {
+		if (userRepository.debitBalance(sender.getId(), amount) == 0) {
 
 			transaction.setStatus(TransactionStatus.FAILED);
 
@@ -73,12 +71,24 @@ public class LedgerService {
 			return;
 		}
 
-		// Credit receiver
-		receiver.setBalance(receiver.getBalance().add(amount));
 
-		log.debug("Updated receiver balance : {}", receiver.getBalance());
+		if (userRepository.creditBalance(receiver.getId(), amount) == 0) {
 
-		userRepository.save(receiver);
+			transaction.setStatus(TransactionStatus.FAILED);
+
+			transaction.setRemarks("Receiver account not found");
+
+			transactionRepository.save(transaction);
+
+			kafkaTemplate.send("payment-failed",
+					new PaymentStatusEvent(event.getTransactionId(), "FAILED", "Receiver account not found"));
+
+			log.error("Payment failed. Receiver account not found for transaction : {}", event.getTransactionId());
+
+			return;
+		}
+
+		log.debug("Receiver account {} credited with amount {}", receiver.getId(), amount);
 
 		transaction.setStatus(TransactionStatus.SUCCESS);
 

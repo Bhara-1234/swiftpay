@@ -63,10 +63,12 @@ public class PaymentValidationUtil {
 
 	private void validateUsers(PaymentRequest request) {
 
-		userRepository.findById(request.getSenderId())
-				.orElseThrow(() -> new ResourceNotFoundException("Sender Account Not Found"));
+		List<Long> ids = List.of(request.getSenderId(), request.getReceiverId());
 
-		userRepository.findById(request.getReceiverId())
-				.orElseThrow(() -> new ResourceNotFoundException("Receiver Account Not Found"));
+		long count = userRepository.countByIdIn(ids);
+
+		if (count != 2) {
+			throw new ResourceNotFoundException("Sender or Receiver Account Not Found");
+		}
 	}
 }
