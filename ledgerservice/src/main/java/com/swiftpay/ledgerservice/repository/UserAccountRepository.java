@@ -9,11 +9,14 @@ import org.springframework.data.repository.query.Param;
 
 import com.swiftpay.ledgerservice.entity.UserAccount;
 
+import jakarta.transaction.Transactional;
+
 public interface UserAccountRepository extends JpaRepository<UserAccount, Long> {
 
 	@Modifying
+	@Transactional
 	@Query("""
-			UPDATE Users u
+			UPDATE UserAccount u
 			SET u.balance = u.balance - :amount
 			WHERE u.id = :userId
 			AND u.balance >= :amount
@@ -21,8 +24,9 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
 	int debitBalance(@Param("userId") Long userId, @Param("amount") BigDecimal amount);
 
 	@Modifying
+	@Transactional
 	@Query("""
-			UPDATE Users u
+			UPDATE UserAccount u
 			SET u.balance = u.balance + :amount
 			WHERE u.id = :userId
 			""")
