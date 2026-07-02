@@ -54,7 +54,10 @@ public class LedgerService {
 
 		log.debug("Amount to transfer : {}", amount);
 
-		if (!validationUtil.validateBalance(sender, amount)) {
+		// Atomic debit operation
+		int rowsUpdated = userRepository.debitBalance(sender.getId(), amount);
+
+		if (rowsUpdated == 0) {
 
 			transaction.setStatus(TransactionStatus.FAILED);
 
@@ -70,23 +73,18 @@ public class LedgerService {
 			return;
 		}
 
-		sender.setBalance(sender.getBalance().subtract(amount));
-
+		// Credit receiver
 		receiver.setBalance(receiver.getBalance().add(amount));
 
-		log.debug("Updated sender balance : {}", sender.getBalance());
-
 		log.debug("Updated receiver balance : {}", receiver.getBalance());
-
-		userRepository.save(sender);
 
 		userRepository.save(receiver);
 
 		transaction.setStatus(TransactionStatus.SUCCESS);
 
-		transactionRepository.save(transaction);
-
 		transaction.setRemarks("Payment Completed Successfully");
+
+		transactionRepository.save(transaction);
 
 		log.info("Transaction {} status updated to SUCCESS", event.getTransactionId());
 

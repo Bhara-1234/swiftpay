@@ -80,14 +80,14 @@ class LedgerServiceApplicationTests {
         when(validationUtil.validateReceiver(event))
                 .thenReturn(receiver);
 
-        when(validationUtil.validateBalance(sender,
+        // CHANGED: mock atomic debit
+        when(userRepository.debitBalance(1L,
                 new BigDecimal("100")))
-                .thenReturn(true);
+                .thenReturn(1);
 
         ledgerService.processPayment(event);
 
-        assertEquals(new BigDecimal("900"),
-                sender.getBalance());
+        // REMOVED: sender balance is no longer updated in-memory
 
         assertEquals(new BigDecimal("600"),
                 receiver.getBalance());
@@ -95,7 +95,11 @@ class LedgerServiceApplicationTests {
         assertEquals(TransactionStatus.SUCCESS,
                 transaction.getStatus());
 
-        verify(userRepository, times(1)).save(sender);
+        // CHANGED: verify atomic debit instead of save(sender)
+        verify(userRepository, times(1))
+                .debitBalance(1L,
+                        new BigDecimal("100"));
+
         verify(userRepository, times(1)).save(receiver);
 
         verify(transactionRepository, times(1))
@@ -136,9 +140,10 @@ class LedgerServiceApplicationTests {
         when(validationUtil.validateReceiver(event))
                 .thenReturn(receiver);
 
-        when(validationUtil.validateBalance(sender,
+        // CHANGED: mock failed atomic debit
+        when(userRepository.debitBalance(1L,
                 new BigDecimal("1000")))
-                .thenReturn(false);
+                .thenReturn(0);
 
         ledgerService.processPayment(event);
 
@@ -148,9 +153,12 @@ class LedgerServiceApplicationTests {
         verify(transactionRepository, times(1))
                 .save(transaction);
 
-        verify(userRepository, never())
-                .save(sender);
+        // CHANGED: verify debit attempted
+        verify(userRepository, times(1))
+                .debitBalance(1L,
+                        new BigDecimal("1000"));
 
+        // sender is never saved anymore
         verify(userRepository, never())
                 .save(receiver);
 
