@@ -1,0 +1,3 @@
+Label,# Samples,Average,Min,Max,Std. Dev.,Error %,Throughput,Received KB/sec,Sent KB/sec,Avg. Bytes
+Payment API,25000,522,1,15536,1332.23,16.200%,388.97792,256.13,103.77,674.3
+TOTAL,25000,522,1,15536,1332.23,16.200%,388.97792,256.13,103.77,674.3

@@ -456,7 +456,39 @@ During load testing, database write operations were identified as the primary bo
 - Scale Gateway and Ledger services horizontally.
 - Introduce Kafka producer batching.
 - Deploy PostgreSQL on a dedicated instance for improved performance.
-  
+
+# Submission Criteria Mapping
+
+The following table demonstrates how the solution satisfies the hackathon submission requirements.
+
+| Submission Criteria | Implementation |
+|---------------------|----------------|
+| **Code Quality** | Clean layered architecture with Controller, Service, Repository, DTO, Entity, Exception, Event, and Utility layers. Meaningful naming conventions and separation of concerns are followed. |
+| **Functionality** | End-to-end payment flow is implemented successfully. Payment requests are accepted, processed asynchronously through Kafka, and transaction status is updated accordingly. |
+| **Insufficient Funds Handling** | Ledger Service validates sender balance and marks transactions as `FAILED` when funds are insufficient. |
+| **DevOps Readiness** | Entire ecosystem (Gateway, Ledger, PostgreSQL, Kafka, Redis, Zookeeper) can be started using a single `docker compose up -d` command. |
+| **Error Handling** | Global exception handling is implemented in both services using `@RestControllerAdvice`. Standard error responses and HTTP status codes are returned. |
+| **Kafka Outage Handling** | Application logs and fails gracefully if Kafka becomes unavailable. |
+| **Database Outage Handling** | Kafka consumer retry mechanism is implemented using Spring Kafka `@RetryableTopic` with configurable retry attempts and backoff intervals. |
+| **Resilience** | Automatic retry mechanism for Kafka consumers ensures temporary database failures do not lead to message loss. |
+| **Observability** | Health check endpoints are exposed through Spring Boot Actuator. Structured application logs are implemented using SLF4J and Logback. |
+| **API Documentation** | All REST endpoints are documented using Swagger/OpenAPI. |
+| **Caching & Idempotency** | Redis is used to ensure duplicate transactions are not processed within a 24-hour window. |
+| **Event-Driven Architecture** | Apache Kafka is used for asynchronous communication between Gateway and Ledger services. |
+| **Containerization** | Each microservice contains an individual Dockerfile and the complete ecosystem is orchestrated through Docker Compose. |
+| **CI/CD** | GitHub Actions workflow compiles code, executes tests, and builds Docker images automatically. |
+| **Performance Testing** | Load testing was performed using Apache JMeter to evaluate system behavior under concurrent requests. |
+| **GitHub Repository** | Complete source code, documentation, Docker configuration, and CI/CD workflow are available in this repository. |
+
+---
+
+# Additional Notes
+
+- Redis is used for idempotency and duplicate transaction prevention.
+- PostgreSQL guarantees transactional consistency for debit and credit operations.
+- Kafka enables asynchronous processing and decoupling between services.
+- Transaction processing in the Ledger Service is executed within a database transaction using `@Transactional`.
+- Retry support is implemented using Spring Kafka's `@RetryableTopic`.
 # Author
 
 **Bodda Bharadwaj**
