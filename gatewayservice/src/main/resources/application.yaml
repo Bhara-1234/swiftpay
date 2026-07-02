@@ -17,42 +17,59 @@ spring:
 
       properties:
         spring.json.add.type.headers: false
+        linger.ms: 5
+        compression.type: snappy
+
+      batch-size: 16384
+      buffer-memory: 33554432
+      acks: 1
 
   datasource:
     url: jdbc:postgresql://postgres:5432/swiftpay
     username: postgres
     password: postgres
 
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
   jpa:
     hibernate:
       ddl-auto: update
 
-    show-sql: true
+    show-sql: false
 
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
 
 management:
 
   endpoints:
-
     web:
-
       exposure:
-
         include: health,info
 
   endpoint:
-
     health:
-
       show-details: always
 
 server:
   port: 8080
 
+  tomcat:
+    threads:
+      max: 400
+      min-spare: 50
+
+    accept-count: 200
+
+    max-connections: 10000
+
 logging:
   level:
     root: INFO
-    com.swiftpay.gatewayservice: DEBUG
+    com.swiftpay.gatewayservice: INFO
