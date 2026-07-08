@@ -1,0 +1,42 @@
+
+         /\      Grafana   /‾‾/
+    /\  /  \     |\  __   /  /
+   /  \/    \    | |/ /  /   ‾‾\
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/
+
+
+     execution: local
+        script: load-test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 5000 max VUs, 24h0m30s max duration (incl. graceful stop):
+              * payment_test: 250.00 iterations/s for 24h0m0s (maxVUs: 300-5000, gracefulStop: 30s)
+
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......: 1000291 249.999851/s
+    checks_succeeded...: 100.00% 1000291 out of 1000291
+    checks_failed......: 0.00%   0 out of 1000291
+
+    ✓ status is 200 or 202
+
+    HTTP
+    http_req_duration..............: avg=3.64ms min=1.57ms med=2.81ms max=976.49ms p(90)=4.02ms p(95)=4.86ms
+      { expected_response:true }...: avg=3.64ms min=1.57ms med=2.81ms max=976.49ms p(90)=4.02ms p(95)=4.86ms
+    http_req_failed................: 0.00%   0 out of 1000291
+    http_reqs......................: 1000291 249.999851/s
+
+    EXECUTION
+    iteration_duration.............: avg=3.76ms min=1.66ms med=2.93ms max=976.58ms p(90)=4.15ms p(95)=5ms
+    iterations.....................: 1000291 249.999851/s
+    vus............................: 0       min=0            max=100
+    vus_max........................: 300     min=300          max=300
+
+    NETWORK
+    data_received..................: 244 MB  61 kB/s
+    data_sent......................: 251 MB  63 kB/s
+
+
