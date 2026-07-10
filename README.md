@@ -568,7 +568,7 @@ The following table demonstrates how the solution satisfies the hackathon submis
 | **Event-Driven Architecture** | Apache Kafka is used for asynchronous communication between Gateway and Ledger services. |
 | **Containerization** | Each microservice contains an individual Dockerfile and the complete ecosystem is orchestrated through Docker Compose. |
 | **CI/CD** | GitHub Actions workflow compiles code, executes tests, and builds Docker images automatically. |
-| **Performance Testing** | Load testing was performed using Apache JMeter to evaluate system behavior under concurrent requests. |
+| **Performance Testing** | Load testing was performed using Apache K6 to evaluate system behavior under concurrent requests. |
 | **GitHub Repository** | Complete source code, documentation, Docker configuration, and CI/CD workflow are available in this repository. |
 
 ---
