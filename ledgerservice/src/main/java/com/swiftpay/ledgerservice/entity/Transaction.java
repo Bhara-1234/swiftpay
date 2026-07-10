@@ -20,12 +20,16 @@ public class Transaction {
     @Column(unique = true, nullable = false)
     private String transactionId;
 
+    @Column(nullable = false)
     private Long senderId;
 
+    @Column(nullable = false)
     private Long receiverId;
 
+    @Column(nullable = false)
     private BigDecimal amount;
 
+    @Column(nullable = false)
     private String currency;
 
     @Enumerated(EnumType.STRING)

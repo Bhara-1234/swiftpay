@@ -1,7 +1,5 @@
 package com.swiftpay.ledgerservice.util;
 
-import java.math.BigDecimal;
-
 import org.springframework.stereotype.Component;
 
 import com.swiftpay.ledgerservice.entity.Transaction;
@@ -39,8 +37,4 @@ public class LedgerValidationUtil {
 				.orElseThrow(() -> new ResourceNotFoundException("Receiver Account Not Found"));
 	}
 
-	public boolean validateBalance(UserAccount sender, BigDecimal amount) {
-
-		return sender.getBalance().compareTo(amount) >= 0;
-	}
 }
