@@ -318,42 +318,63 @@ docker compose down
 
 ---
 
-# Swagger Documentation
+# API Documentation
 
-## Gateway Service
+This project uses **Springdoc OpenAPI** to automatically generate API documentation for all REST endpoints.
+
+---
+
+# Gateway Service
+
+## Swagger UI
 
 ```text
 http://localhost:8080/swagger-ui/index.html
 ```
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/761cc3d7-1dd2-42b5-9638-06c32869da38" />
 
+### Screenshots
 
-## Ledger Service
+<img width="1920" height="1080" alt="Gateway Swagger UI 1" src="https://github.com/user-attachments/assets/761cc3d7-1dd2-42b5-9638-06c32869da38" />
+
+<img width="1920" height="1080" alt="Gateway Swagger UI 2" src="https://github.com/user-attachments/assets/923ddbc9-42cf-4cf2-93e0-faee612d0563" />
+
+<img width="1920" height="1080" alt="Gateway Swagger UI 3" src="https://github.com/user-attachments/assets/5dd77a6d-b3cd-45a8-bbf3-76b13153e084" />
+
+<img width="1920" height="1080" alt="Gateway Swagger UI 4" src="https://github.com/user-attachments/assets/bc8d3ea0-d425-47eb-9b34-eb088b4b94ef" />
+
+## OpenAPI Specification (JSON)
+
+```text
+http://localhost:8080/v3/api-docs
+```
+
+### Screenshots
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d5f5cbf5-804d-4c44-875d-2104d8b246ff" />
+
+---
+
+# Ledger Service
+
+## Swagger UI
 
 ```text
 http://localhost:8081/swagger-ui/index.html
 ```
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e063d44b-336f-411c-8a00-db6b8ca56633" />
 
----
+### Screenshots
 
-# Health Endpoints
+<img width="1920" height="1080" alt="Ledger Swagger UI" src="https://github.com/user-attachments/assets/e063d44b-336f-411c-8a00-db6b8ca56633" />
 
-## Gateway
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/fd1501bd-aa8d-4c4e-89d3-66147e3d8afb" />
+## OpenAPI Specification (JSON)
 
 ```text
-http://localhost:8080/actuator/health
+http://localhost:8081/v3/api-docs
 ```
 
-## Ledger
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/32423565-4238-4a70-a833-247be2b9f062" />
+### Screenshots
 
-```text
-http://localhost:8081/actuator/health
-```
-
----
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ef3f6933-4e4e-4bc2-b751-6608e47b3c09" />
 
 # Logging
 
