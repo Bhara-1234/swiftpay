@@ -3,7 +3,7 @@ version: '3.8'
 services:
 
   gateway:
-    image: bharadwajbodda/swiftpay:gateway-payment
+    image: bharadwajbodda/swiftpay:gatewaypayment
     container_name: gateway
     restart: always
 
@@ -19,7 +19,7 @@ services:
       - "8080:8080"
 
   ledger:
-    image: bharadwajbodda/swiftpay:ledger-consumer
+    image: bharadwajbodda/swiftpay:ledgerconsumer
     container_name: ledger
     restart: always
 
