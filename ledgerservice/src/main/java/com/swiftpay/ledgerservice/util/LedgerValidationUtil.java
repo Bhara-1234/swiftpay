@@ -1,11 +1,11 @@
 package com.swiftpay.ledgerservice.util;
 
+import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 import com.swiftpay.ledgerservice.entity.Transaction;
 import com.swiftpay.ledgerservice.entity.UserAccount;
 import com.swiftpay.ledgerservice.event.PaymentEvent;
-import com.swiftpay.ledgerservice.exception.ResourceNotFoundException;
 import com.swiftpay.ledgerservice.repository.TransactionRepository;
 import com.swiftpay.ledgerservice.repository.UserAccountRepository;
 

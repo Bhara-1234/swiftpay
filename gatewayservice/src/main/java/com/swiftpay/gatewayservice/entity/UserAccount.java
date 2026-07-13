@@ -18,6 +18,7 @@ public class UserAccount {
 
 	@Id
 	@NotNull(message = "User id is required")
+	@Column(nullable = false)
 	private Long id;
 
 	@NotBlank(message = "Name is required")

@@ -13,6 +13,7 @@ import com.swiftpay.ledgerservice.entity.UserAccount;
 import com.swiftpay.ledgerservice.enums.TransactionStatus;
 import com.swiftpay.ledgerservice.event.PaymentEvent;
 import com.swiftpay.ledgerservice.event.PaymentStatusEvent;
+import com.swiftpay.ledgerservice.exception.ResourceNotFoundException;
 import com.swiftpay.ledgerservice.repository.TransactionRepository;
 import com.swiftpay.ledgerservice.repository.UserAccountRepository;
 import com.swiftpay.ledgerservice.util.LedgerValidationUtil;
@@ -54,7 +55,6 @@ public class LedgerService {
 
 		log.debug("Amount to transfer : {}", amount);
 
-
 		if (userRepository.debitBalance(sender.getId(), amount) == 0) {
 
 			transaction.setStatus(TransactionStatus.FAILED);
@@ -70,7 +70,6 @@ public class LedgerService {
 
 			return;
 		}
-
 
 		if (userRepository.creditBalance(receiver.getId(), amount) == 0) {
 
@@ -109,6 +108,10 @@ public class LedgerService {
 	public List<TransactionHistoryResponse> getTransactions(Long userId) {
 
 		log.info("Fetching transaction history for user : {}", userId);
+
+		if (!userRepository.existsById(userId)) {
+			throw new ResourceNotFoundException("User not found");
+		}
 
 		List<TransactionHistoryResponse> transactions = transactionRepository.findBySenderIdOrReceiverId(userId, userId)
 				.stream()
