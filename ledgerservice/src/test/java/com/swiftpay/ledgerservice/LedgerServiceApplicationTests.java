@@ -2,6 +2,7 @@ package com.swiftpay.ledgerservice;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -26,6 +27,7 @@ import com.swiftpay.ledgerservice.entity.UserAccount;
 import com.swiftpay.ledgerservice.enums.TransactionStatus;
 import com.swiftpay.ledgerservice.event.PaymentEvent;
 import com.swiftpay.ledgerservice.event.PaymentStatusEvent;
+import com.swiftpay.ledgerservice.exception.ResourceNotFoundException;
 import com.swiftpay.ledgerservice.repository.TransactionRepository;
 import com.swiftpay.ledgerservice.repository.UserAccountRepository;
 import com.swiftpay.ledgerservice.service.LedgerService;
@@ -171,6 +173,8 @@ class LedgerServiceApplicationTests {
 		transaction.setCurrency("INR");
 		transaction.setStatus(TransactionStatus.SUCCESS);
 
+		when(userRepository.existsById(1L)).thenReturn(true);
+
 		when(transactionRepository.findBySenderIdOrReceiverId(1L, 1L)).thenReturn(List.of(transaction));
 
 		List<TransactionHistoryResponse> response = ledgerService.getTransactions(1L);
@@ -192,11 +196,14 @@ class LedgerServiceApplicationTests {
 
 		assertEquals("SUCCESS", txn.getStatus());
 
+		verify(userRepository, times(1)).existsById(1L);
 		verify(transactionRepository, times(1)).findBySenderIdOrReceiverId(1L, 1L);
 	}
 
 	@Test
 	void getTransactions_EmptyList() {
+
+		when(userRepository.existsById(1L)).thenReturn(true);
 
 		when(transactionRepository.findBySenderIdOrReceiverId(1L, 1L)).thenReturn(List.of());
 
@@ -205,6 +212,22 @@ class LedgerServiceApplicationTests {
 		assertNotNull(response);
 		assertTrue(response.isEmpty());
 
+		verify(userRepository, times(1)).existsById(1L);
 		verify(transactionRepository, times(1)).findBySenderIdOrReceiverId(1L, 1L);
+	}
+
+	@Test
+	void getTransactions_UserNotFound() {
+
+		when(userRepository.existsById(1L)).thenReturn(false);
+
+		ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+				() -> ledgerService.getTransactions(1L));
+
+		assertEquals("User not found", exception.getMessage());
+
+		verify(userRepository, times(1)).existsById(1L);
+
+		verify(transactionRepository, never()).findBySenderIdOrReceiverId(any(), any());
 	}
 }
